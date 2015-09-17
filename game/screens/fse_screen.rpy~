@@ -1,0 +1,163 @@
+# Custom screens for MER Fast Sex Engine
+
+##############################################################################
+# Main 
+#
+
+screen fse_main():    # MAIN SCREEN OF MINI-GAME WITH ALL THE STATICSTICS
+    frame: # AI NAME
+        xysize (200, 30) # A size of this frame in pixels.
+        align (0.99, 0.01) # Positioning on the screen.
+        has vbox spacing 10
+        text ai.name 
+        
+    frame: # AI STATBLOCK
+        xysize (200, 220) # A size of this frame in pixels.
+        align (0.95, 0.95) # Positioning on the screen.
+        
+        # Frame by default takes fixed as it's child. Fixed layout means everything will be positioned as programmer wishes it, no forced order or anything like that. We are not going to change that.
+        # We however are going to change that default to a vbox. VBox plainly means that everything in the container will be placed vertically, automatically by Ren'Py! like so:
+        has vbox spacing 10 # spacing tells vbox to put 10 pixels between it's children
+        
+        text "Pleasure: {0} ({1})".format(ai.pleasure, game.players[1].get_pleasure_threshold()) 
+        text "Pain: {}".format(ai.pain) 
+        text "Shame: {}".format(ai.shame)         
+        text "\nExtasy: {}".format(ai.extasy_tokens)         
+        
+    imagebutton: # AI AVATAR
+        align (0.95, 0.1)
+        idle im.Scale(game.players[1].avatar, 200, 200)
+        hover im.MatrixColor(im.Scale(game.players[1].avatar, 200, 200), im.matrix.brightness(0.05))
+        action Return("show_ai_role")
+
+    imagebutton: # AI IMPLEMENT
+        align (0.95, 0.5)
+        idle im.Scale(game.players[1].active_implement.image, 200, 200)
+        hover im.MatrixColor(im.Scale(game.players[1].active_implement.image, 200, 200), im.matrix.brightness(0.05))
+        action Return("show_ai_implement")
+
+    frame: # PLAYER NAME
+        xysize (200, 30) # A size of this frame in pixels.
+        align (0.05, 0.01) # Positioning on the screen.
+        has vbox spacing 10
+        text player.name 
+        
+    imagebutton: # PLAYER AVATAR
+        align (0.05, 0.1)
+        idle im.Scale(game.players[0].avatar, 200, 200)
+        hover im.MatrixColor(im.Scale(game.players[0].avatar, 200, 200), im.matrix.brightness(0.05))
+        action Return("show_your_role")
+
+    imagebutton: # PLAYER IMPLEMENT
+        align (0.05, 0.5)
+        idle im.Scale(game.players[0].active_implement.image, 200, 200)
+        hover im.MatrixColor(im.Scale(game.players[0].active_implement.image, 200, 200), im.matrix.brightness(0.05))
+        action Return("show_your_implement")
+        
+    frame: # PLAYER STATBLOCK
+        xysize (200, 220) # A size of this frame in pixels.
+        align (0.05, 0.95) # Positioning on the screen.       
+        has vbox spacing 10
+        text "Pleasure: {0} ({1})".format(player.pleasure, game.players[0].get_pleasure_threshold())
+        text "Pain: {}".format(player.pain) 
+        text "Shame: {}".format(player.shame)     
+        text "\nExtasy: {}".format(player.extasy_tokens)         
+        
+    frame: # CONTROL MENU
+        xysize (600, 200)
+        align (0.5, 0.95)
+        has hbox spacing 10
+        
+        # Player has direct control over his/her cards, so we interate over the deck and create buttons on the screen:
+        hbox: # Same thing as VBox, just horizontal positioning.
+            xysize (600, 200)
+            box_wrap True
+            xfill True
+            vbox:
+                xalign 0.1 
+                text "[player.name]\n"                
+                textbutton "Hand":
+                    action SetVariable("table_status", "your_hand")
+                textbutton "Deck":
+                    action SetVariable("table_status", "your_deck")
+                textbutton "Discard  pile":
+                    action SetVariable("table_status", "your_discard")
+            vbox:
+                xalign 0.5       
+                textbutton "Table":
+                    action SetVariable("table_status", "played_on_table")
+                textbutton "PASS":
+                    action Return("pass")
+            vbox:   
+                xalign 0.9          
+                text "[ai.name]\n"
+                textbutton "Hand":
+                    action SetVariable("table_status", "ai_hand")
+                textbutton "Deck":
+                    action SetVariable("table_status", "ai_deck")
+                textbutton "Discard pile":
+                    action SetVariable("table_status", "ai_discard")
+                
+    frame: # TABLE MENU
+        xysize (600, 420)
+        align (0.5, 0.1)
+        has vbox spacing 10
+        if table_status == "your_hand":
+            text "YOUR AVIABLE ACTIONS\n"
+            hbox:
+                box_wrap True
+                for card in game.players[0].hand:
+                    textbutton card.name:
+                        action Return(["play card", card, game.players[1]]) # action is whatever we want this button to do. Return returns a list with card and ai to the loop.
+        elif table_status == "your_deck":
+            text "ACTIONS IN YOUR DECK\n"
+            hbox:
+                box_wrap True
+                for card in game.players[0].deck:
+                    textbutton card.name:
+                        action Return(["show card", card])
+        elif table_status == "your_discard":
+            text "YOUR USED ACTIONS\n"
+            hbox:
+                box_wrap True
+                for card in game.players[0].discard_pile:
+                    textbutton card.name:
+                        action Return(["show card", card])
+        elif table_status == "played_on_table":
+            text "ACTIONS MADE THIS ROUND\n"
+            hbox:
+                box_wrap True
+                text "[player.name]: "
+                for card in game.players[0].table:
+                   textbutton card.name:
+                        action Return(["show card", card])
+            hbox:
+                box_wrap True
+                text "[ai.name]: "
+                for card in game.players[1].table:
+                    textbutton card.name:
+                        action Return(["show card", card])    
+        elif table_status == "ai_hand":
+            text "PARTNERs AVIABLE ACTIONS\n"
+            hbox:
+                box_wrap True
+                for card in game.players[1].hand:
+                    textbutton card.name:
+                        action Return(["show card", card,]) # action is whatever we want this button to do. Return returns a list with card and ai to the loop.
+        elif table_status == "ai_deck":
+            text "ACTIONS IN PARTNERs DECK\n"
+            hbox:
+                box_wrap True
+                for card in game.players[1].deck:
+                    textbutton card.name:
+                        action Return(["show card", card])
+        elif table_status == "ai_discard":
+            text "PARTNER USED ACTIONS\n"
+            hbox:
+                box_wrap True
+                for card in game.players[1].discard_pile:
+                    textbutton card.name:
+                        action Return(["show card", card])                        
+        else:
+            text "ERROR. WRONG table_status"            
+

@@ -1,0 +1,19 @@
+﻿init -2 python:
+    import sys
+    sys.path.append(renpy.loader.transfn("scripts"))
+    
+init -1 python:
+    from random import *
+   
+init python:
+    pass
+
+# The game starts here.
+label start:
+    show expression "interface/bg_base.jpg" as bg
+    
+    menu:
+        "Ждать":
+            pass
+
+    return

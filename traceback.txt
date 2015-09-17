@@ -1,0 +1,33 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/script.rpy", line 19, in script call
+    call user_turn
+  File "game/script.rpy", line 24, in script call
+    call location_to_call
+  File "game/script.rpy", line 19, in script call
+    call user_turn
+  File "game/script.rpy", line 24, in script call
+    call location_to_call
+ScriptError: could not find label 'location_to_call'.
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "game/script.rpy", line 19, in script call
+    call user_turn
+  File "game/script.rpy", line 24, in script call
+    call location_to_call
+  File "F:\Development\RenPy\renpy-6.15.7-sdk\renpy\ast.py", line 1283, in execute
+    rv = renpy.game.context().call(label, return_site=self.next.name)
+  File "game/script.rpy", line 19, in script call
+    call user_turn
+  File "game/script.rpy", line 24, in script call
+    call location_to_call
+  File "F:\Development\RenPy\renpy-6.15.7-sdk\renpy\script.py", line 602, in lookup
+    raise ScriptError("could not find label '%s'." % str(original))
+ScriptError: could not find label 'location_to_call'.
+
+Windows-7-6.1.7601-SP1
+Ren'Py 6.99.4.467
+MER Prototype 0.1
